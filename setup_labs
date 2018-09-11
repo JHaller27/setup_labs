@@ -1,0 +1,31 @@
+#!/usr/bin/python3
+
+import zipfile, sys, os, re
+
+regex = r'^[0-9]+-[0-9]+\s-\s'
+
+# Extract main zip
+main_zip = sys.argv[1]
+path = sys.argv[2]
+print('Extracting "%s" to "%s"...' % (main_zip, path))
+zip_ref = zipfile.ZipFile(main_zip, 'r')
+zip_ref.extractall(path)
+zip_ref.close()
+
+# Extract sub-zips
+files = os.listdir(path)
+for fname in files:
+    if fname.endswith('.zip'):
+        # Get names
+        new_name = re.sub(regex, '', fname)
+        new_name_no_ext = re.sub('\.zip$', '', new_name)
+
+        path_to_extract = os.path.join(path, fname)
+        dest_name = os.path.join(path, 'extracted', new_name_no_ext)
+
+        # Extract
+        print('Extracting "%s" to "%s"...' % (path_to_extract, dest_name))
+        zip_ref = zipfile.ZipFile(path_to_extract, 'r')
+        zip_ref.extractall(dest_name)
+        zip_ref.close()
+
